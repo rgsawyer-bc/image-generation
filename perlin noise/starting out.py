@@ -50,12 +50,12 @@ class PerlinGrid():
 
         for i in range(0, height + 1, freq):
             for j in range(0, width + 1, freq):
-                # selectedVec = random.choice(self.vecs)
-                #self.vecGrid[i][j] = selectedVec
+                selectedVec = random.choice(self.vecs)
+                self.vecGrid[i][j] = selectedVec
 
-                angle = math.tau * random.random()
+                # angle = math.tau * random.random()
 
-                self.vecGrid[i][j] = (math.cos(angle), math.sin(angle))
+                # self.vecGrid[i][j] = (math.cos(angle), math.sin(angle))
 
 
     def getAdjacentIndeces(self, coord: tuple[int]) -> list[tuple[int]]:
@@ -312,74 +312,6 @@ class MulticolorFur(PerlinFlowField):
         return copy
     
 
-class RainbowFur(PerlinFlowField):
-    def __init__(self, freq: int, width: int, height: int, speed:int, density:int, frames:int, fade = fade, color = rgb, wraparound = False, image = None) -> None:
-        super().__init__(freq, width, height, speed, density, frames, fade = fade, color = rgb, wraparound = False)
-
-        if image is None:
-            self.image = Image.new( mode = "HSV", size = (self.width, self.height) )
-        else:
-            self.image = image
-
-
-    def plot(self, img: Image, t: int, maxt: int) -> Image:
-        copy = img.copy()
-        draw = ImageDraw.Draw(copy, "HSV")
-
-
-        start = 200
-        r = start - start * t/maxt
-
-        # saturation = int(255*t/maxt)
-        saturation = 150
-        value = int(255*t/maxt)
-
-        colorMod = int(360*t/maxt)
-
-        for index, point in enumerate(self.points):
-            x, y = point
-            c = int(x/self.width*63.76 + 300) % 360
-
-            draw.ellipse(
-                [(x - r, y - r), (x + r, y + r)], fill = (c, saturation, value)
-            )
-
-        return copy
-    
-
-    def video(self) -> None:
-        img = self.image
-        framelist = []
-
-        for i in range(self.frames):
-            print(i)
-
-            img = self.plot(img, i, self.frames)
-            framelist.append(img)
-
-            self.updatePoints()
-
-        framelist = [frame.convert("RGB") for frame in framelist]
-
-        clips = [mpe.ImageClip(np.array(img)).set_duration(.016) for img in framelist]
-        video = mpe.concatenate_videoclips(clips)
-        video.write_videofile("WACKY VIDEO.mp4", fps=60)
-
-        lastImage = framelist[-1]
-        lastImage.save("last image.png")
-
-        return lastImage
-    
-
-class RainbowFurNewVec(RainbowFur):
-    def __init__(self, freq: int, width: int, height: int, speed:int, density:int, frames:int, fade = fade, color = rgb, wraparound = False, image = None) -> None:
-        super().__init__(freq, width, height, speed, density, frames, fade = fade, color = rgb, wraparound = False)
-
-    
-    def getVal(self, coord: tuple[int]) -> float: # [0, 1]
-        x, y = coord
-    
-
 class Wuh(PerlinFlowField):
     def __init__(self, freq: int, width: int, height: int, speed:int, density:int, frames:int, fade = fade, color = rgb, wraparound = False) -> None:
         super().__init__(freq, width, height, speed, density, frames, fade = fade, color = rgb, wraparound = False)
@@ -444,9 +376,75 @@ class Wuhg(PerlinFlowField):
             )
 
         return copy
+    
+
+class RainbowFur(PerlinFlowField):
+    def __init__(self, freq: int, width: int, height: int, speed:int, density:int, frames:int, fade = fade, color = rgb, wraparound = False, image = None) -> None:
+        super().__init__(freq, width, height, speed, density, frames, fade = fade, color = rgb, wraparound = False)
+
+        if image is None:
+            self.image = Image.new( mode = "HSV", size = (self.width, self.height) )
+        else:
+            self.image = image
+
+        self.sizes = random.choices(range(25,150), k = density)
 
 
-a = RainbowFur(500, 2000, 1000, speed = 2, density = 1000, frames = 240, fade = fade)
+    def plot(self, img: Image, t: int, maxt: int) -> Image:
+        copy = img.copy()
+        draw = ImageDraw.Draw(copy, "HSV")
+
+
+        #start = 200
+        #r = start - start * t/maxt
+
+        # saturation = int(255*t/maxt)
+        saturation = 100
+        value = int(255*t/maxt)
+
+        colorMod = int(360*t/maxt)
+
+        for index, point in enumerate(self.points):
+            x, y = point
+
+            start = self.sizes[index]
+            r = start - start * t/maxt
+
+            # c = int(x/self.width*63.76 + 337.18) % 360
+            c = 40
+
+            draw.ellipse(
+                [(x - r, y - r), (x + r, y + r)], fill = (c, saturation, value)
+            )
+
+        return copy
+    
+
+    def video(self) -> None:
+        img = self.image
+        framelist = []
+
+        for i in range(self.frames):
+            print(i)
+
+            img = self.plot(img, i, self.frames)
+            framelist.append(img)
+
+            self.updatePoints()
+
+        framelist = [frame.convert("RGB") for frame in framelist]
+
+        clips = [mpe.ImageClip(np.array(img)).set_duration(.016) for img in framelist]
+        video = mpe.concatenate_videoclips(clips)
+        video.write_videofile("WACKY VIDEO.mp4", fps=60)
+
+        lastImage = framelist[-1]
+        lastImage.save("last image.png")
+
+        return lastImage
+
+
+a = RainbowFur(500, 2000, 1000, speed = 2, density = 2750, frames = 240, fade = fade)
 # a = PerlinFlowField(500, 1500, 1500, speed = 2, density = 500, frames = 240, fade = fade)
 
 a.video()

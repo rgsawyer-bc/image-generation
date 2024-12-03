@@ -26,25 +26,29 @@ def rgb(x, width = 255):
 width = 1000
 height = 1000
 
-img = Image.new( "RGB", (width, height) )
+img = Image.new( "RGB", (width, height))
 draw = ImageDraw.Draw(img, "RGBA")
 
-maxscale = 250
+maxScale = 400 #250
+minScale = 75
 
-startCircles = 100
+startCircles = 60 # 100
 endCircles = 50
+# scaleFactor = 1/2 # 3/4
+
 maxj = 100
 step = 5
 
-slope = (startCircles - endCircles)/maxj
+scaleSlope = (maxScale - minScale) / maxj
+slope = (startCircles - endCircles) / maxj
 
 
 for j in range(0, maxj, step):
     r = 100 - j
     circles = int(startCircles - slope*j)
     opacity = int((j/8)**2)
-    xs = scipy.stats.norm.rvs(loc = width/2, scale = maxscale - j*3/4, size = circles) #maxscale = 200, -j*1/2
-    ys = scipy.stats.norm.rvs(loc = height/2, scale = maxscale - j*3/4, size = circles)
+    xs = scipy.stats.norm.rvs(loc = width/2, scale = maxScale - j*scaleSlope, size = circles) #maxscale = 200, -j*1/2
+    ys = scipy.stats.norm.rvs(loc = height/2, scale = maxScale - j*scaleSlope, size = circles)
     points = [(xs[i], ys[i]) for i in range(circles)]
 
     c = rgb(j*2)
@@ -59,3 +63,5 @@ for j in range(0, maxj, step):
         )
 
 img.save("trying to make a paint splotch/bargain.png")
+
+# perlin noise for movement?

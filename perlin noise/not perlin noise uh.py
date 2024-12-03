@@ -47,7 +47,7 @@ class Fur():
 
         for index, point in enumerate(self.points):
             x, y = point
-            c = int(x/self.width*63.76 + 337.18) % 360
+            c = int(x/self.width*63.76 + 300) % 360
 
             draw.ellipse(
                 [(x - r, y - r), (x + r, y + r)], fill = (c, saturation, value)
@@ -86,5 +86,13 @@ def radial(p: list[int | float]) -> list[float]:
         (1/100)*(-y + (1080/2)),
         (1/100)*(x - (1920/2))
     )
+
+def uhh(p: list[int | float]) -> list[float]:
+    x, y = p
+    return(
+        100 * (-y + (1080/2))/x,
+        100*(x - (1920/2))/y
+    )
+
 
 Fur(1920, 1080, 0, 1000, 480).video(radial)
