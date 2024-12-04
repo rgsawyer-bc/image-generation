@@ -410,8 +410,8 @@ class RainbowFur(PerlinFlowField):
             start = self.sizes[index]
             r = start - start * t/maxt
 
-            # c = int(x/self.width*63.76 + 337.18) % 360
-            c = 40
+            c = int(x/self.width*63.76 + 337.18) % 360
+            # c = 40
 
             draw.ellipse(
                 [(x - r, y - r), (x + r, y + r)], fill = (c, saturation, value)

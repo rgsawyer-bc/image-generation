@@ -2,6 +2,7 @@ from triangle import *
 from PIL import Image, ImageDraw
 from math import sqrt
 import random
+from gradientPolygon import linear_gradient
 
 
 class TriangleGrid:
@@ -53,5 +54,58 @@ class TriangleGrid:
         img.save("grid/test.png")
 
         return img
+    
 
-TriangleGrid(1920, 1080, 100, 8).generateImage()
+class GradientTriangleGrid:
+    def __init__(self, width: int, height: int, s: int, outline: int) -> None:
+        self.width = width
+        self.height = height
+        self.s = s
+        self.outline = outline
+
+
+    def generateImage(self) -> Image:
+        bigWidth = self.width + 2 * self.s
+        bigHeight = self.height + 2 * self.s
+        img = Image.new("RGBA", (bigWidth, bigHeight))
+
+        h = self.s*sqrt(3)/2
+
+        y = h
+        yorientation = "up"
+
+        while y < bigHeight:
+            print(y/self.height)
+            x = self.s/2
+            xorientation = yorientation
+
+            while x < bigWidth:
+                center = (x, y)
+
+                hueBase = int(x*y/bigWidth/bigHeight * 120 + 120) # *255
+                hueDifference = 20 # 50
+
+                gradientDifference = 12 # 25
+
+                hue = random.choice(range(hueBase, hueBase + hueDifference))
+                c1 = rgb(hue, width = 255)
+                c2 = rgb(hue + gradientDifference, width = 255)
+
+                t = Triangle(center, self.s, color = (0, 0, 0), orientation = xorientation)
+                gradIndeces = random.sample(t.indeces, 2)
+                img = linear_gradient(img, t.indeces, gradIndeces[0], gradIndeces[1], c1, c2)
+                xorientation = "up" if xorientation == "down" else "down"
+                x += self.s/2
+                
+            yorientation = "up" if yorientation == "down" else "down"
+            y += h
+
+        img.save("grid/bigger.png")
+
+        img = img.crop((self.s, self.s, self.width + self.s, self.height + self.s))
+
+        img.save("grid/gradient test.png")
+
+        return img
+
+GradientTriangleGrid(1920, 1080, 100, 8).generateImage()
